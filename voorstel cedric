@@ -1,0 +1,35 @@
+Decompositie:
+1) Protocol klasse (makkelijk aan te roepen functies voor het verkrijgen
+   en verzenden van data naar de robot).
+2) Reflex: draai robot als hij in de buurt komt van een object 
+   (bv. door een afstotende aura om objecten te plaatsen). Deze reflex kan
+   onderdrukt worden door hogere lagen.
+3) Plaatsbepaling gebaseerd op driehoeksmeting (echo en laser) en 
+   wielomwentelingen (begin positie is bekend).
+4) Mapping en navigatie. Voorstellen voor mapping:
+   - Keep it simple methode: stel de ruimte voor als een grid en markeer
+     obstakels (evt met een nummer om een idee te krijgen van het soort
+     obstakel). Er zijn verschillende pad algoritmen bekend om met zo'n 2D map
+     de robot van punt A naar punt B te laten bewegen.
+   - Image based mapping: Maak een graaf representatie van de vrije ruimte door
+     de robot een vaste stap te laten maken, en voor iedere knoop alle sensor
+     data op te slaan. Een punt kan later weer herkend worden door oude en
+     nieuwe data te matchen. Maak bv een afbeelding van de omgeving en vergelijk
+     die met oude data (we hebben bij Rein een paar algoritmen geleerd om dat
+     te doen). Navigeren van A naar B is dan een kwestie van het korste pad in
+     de graaf vinden.
+   - Breng alleen de vrije ruimte in beeld. Bij iedere stap omgeving scannen.
+     Plaatsbepaling van objecten m.b.v. driehoeksmeting. Een niet eerder gemeten 
+     punt wordt toegevoegd (2 extra metingen zijn nodig voor de plaatsbepaling).
+     Methoden zoals het street algoritme kunnen worden gebruikt om een redelijke 
+     weg door de omgeving te vinden. Een andere methode is om de kaart voor te 
+     stellen als een heuvel landschap, het doel ligt in een dal en obstakels 
+     vormen heuvels. De robot gedraagt zich als water en loopt langs de diepste 
+     punten van het landschap.
+     
+     
+Vragen:
+- Op welke manier moeten deze onderdelen samen werken (functie calls, autonoom,
+  over een IP verbinding, etc.)
+- Welk doel willen we bereiken, het is makkelijker om bv een geschikt mapping
+  algoritme te kiezen als we een doel bedenken voor de robot.
