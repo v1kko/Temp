@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """
 Sensors.py
+
+Purely receiving so far, not finished by any means
 """
 
 from control import *
