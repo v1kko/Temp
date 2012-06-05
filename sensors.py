@@ -9,7 +9,9 @@ from control import *
 
 class Sensors():
     def __init__(self):
-        self.sock = None        
+        self.sock = None   
+        
+        self.data = ""
         
         self.laser = ""
         self.odometer = ""
@@ -25,12 +27,14 @@ class Sensors():
         
     def run(self):
         while(self.running):
-            src, data = receive(True)
+            src, rcv = receive(True)
+            
+            self.data = self.data + recv            
             
             if data != None:
                 data = data.split('\r\n')
 
-                for i in range(len(data)):
+                for i in range(len(data) - 1):
                     if not data[i].find("Laser"):
                         self.laser = data[i]
                     elif not data[i].find("Odometer"):
@@ -38,3 +42,6 @@ class Sensors():
                         break
                     elif not data[i].find("Sonar"):
                         self.sonar = sonar[i]
+                        
+                self.data = self.data[len(data) - 1]
+    
