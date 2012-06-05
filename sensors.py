@@ -11,9 +11,9 @@ class Sensors():
     def __init__(self):
         self.data = ""
         
-        self.sensors = {"ODOMETRY" : "",
-                        "LASER" : "",
-                        "SONAR" : ""}     
+        self.sensors = {"LASER" : "",  #"SENS LASER"
+                        "ODOMETRY" : "", # "SENS ODOMETRY <float x> <float y> <float z>"
+                        "SONAR" : ""} #"SENS LASER"  
         
         self.running = True
         self.run()
@@ -27,6 +27,7 @@ class Sensors():
 
                 self.data = self.data.split('\r\n')
 
+                # TODO: Refactor msges
                 for i in range(len(data) - 1):
                     if not data[i].find("Laser"):
                         self.sensors["LASER"] = data[i]
@@ -46,6 +47,3 @@ class Sensors():
                         send(src + ' SENS ' + data[1] + ' ' + self.sensors[data[1]] )
                     except:
                         send(src + ' SENS FAIL ' + data[1] + ' ' )
-                        
-                        
-"SENS ODOMETRY <float x> <float y> <float z>"
