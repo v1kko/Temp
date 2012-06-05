@@ -1,0 +1,21 @@
+Download putty (http://www.chiark.greenend.org.uk/~sgtatham/putty/download.html)
+Ga naar ssh -> Tunnels
+
+Source port: 5000 (ofzo)
+Destination: localhost:3000
+
+Ga naar Session
+
+Host Name: deze.science.uva.nl
+Saved Sessions: Vul een naam in
+Druk Save
+
+Dubbelklik je bewaarde sessie om te beginnen
+Log in met science naam/wachtwoord
+Start USARSim
+Als je dan bv telnet 5000 doet kan je nu commando's geven als:
+INIT {ClassName USARBot.P2DX}{Name hippopotomonstrosesquipedaliophobia}{Location 4.5,1.9,1.8}
+DRIVE {Left -100} {Right 100}
+
+De output zie je dan de uitvoer van de sensoren (escape ingame is pauze;
+en tijdens pauze kan je nog steeds commando's geven)
