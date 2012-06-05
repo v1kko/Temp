@@ -24,4 +24,3 @@ class Steering:
         if not control.send('SENSORS GET ODOMETRY'):
             return None
         module, data = control.receive(True).split(' ', 1)
-            
