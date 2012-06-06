@@ -1,5 +1,5 @@
 from Queue import Queue
-import control
+import Control
 
 
 class Steering:
