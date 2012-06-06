@@ -17,3 +17,10 @@ def send (dest, data):
 	Returns True on succes
 	"""
 	return
+def init ():
+	"""
+	This function must be in the __init__ function of all modules for them to
+	work correctly
+	Returns nothing
+	"""
+
