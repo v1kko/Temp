@@ -11,14 +11,14 @@ class Sensors():
     def __init__(self):
         self.data = ""
         
-        self.sensors = {"LASER" : "",  #"SENS LASER"
+        self.sensors = {"LASER" : "",    # "SENS LASER"
                         "ODOMETRY" : "", # "SENS ODOMETRY <float x> <float y> <float z>"
-                        "SONAR" : ""} #"SENS LASER"  
+                        "SONAR" : ""}    # "SENS SONAR <float F1> <float F2> <float F3> <float F4> <float F5> <float F6> <float F7> <float F8>"  
         
         self.running = True
-        self.run()
+        self.receive()
         
-    def run(self):
+    def receive(self):
         while(self.running):
             src, rcv = receive(True)
             
@@ -30,13 +30,21 @@ class Sensors():
 
                 # TODO: Refactor msges
                 for i in range(len(data) - 1):
-                    if not data[i].find("Laser"):
+                    if not self.data[i].find("Laser"):
                         self.sensors["LASER"] = data[i]
                         break
-                    elif not data[i].find("Odometry"):
-                        self.sensors["ODOMETRY"] = data[i]
+                    elif not self.data[i].find("Odometry"):
+                        temp = self.data[i].split(' ')
+                        vals = temp[6].split(',')
+                        self.sensors["ODOMETRY"] = "ODOMETRY " + vals[0] + vals[1] + vals[2].split('}')[0]
                         break
-                    elif not data[i].find("Sonar"):
+                    elif not self.data[i].find("Sonar"):
+                        temp = self.data[i].split(' ')
+                        string = "SONAR"
+                        # XXX: Not sure if OK
+                        for i in range(8):
+                            string = string + ' ' +  temp[3 * i + 8].split('}')[0]
+                        
                         self.sensors["SONAR"] = sonar[i]
                         
                 self.data = self.data[len(data) - 1]
@@ -44,9 +52,12 @@ class Sensors():
             # Respond to msges from main
             # TODO: respond to resets n stuff
             elif src == "Main":
+                # 
                 if rcv == "RESTART":
                     self.running = False
                     self.reset()
+                if rcv == "STOP":
+                    self.running = False
 
             # Reply to GET
             else:
@@ -54,9 +65,9 @@ class Sensors():
                 if rcv[0] == GET:
                     # XXX: if x in y instead of try?
                     try:
-                        send(src + ' SENS ' + recv[1] + ' ' + self.sensors[recv[1]] )
+                        send(src + ' ' + self.sensors[rcv[1]] )
                     except:
-                        send(src + ' SENS FAIL ' + recv[1] + ' ' )
+                        send(src + ' ' + rcv[1] + ' FAIL' )
 
     # Well obviously...
     def reset(self):
@@ -65,4 +76,4 @@ class Sensors():
             self.sensors[i] = ""
             
         self.running = True
-        self.run()
+        self.receive()
