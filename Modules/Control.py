@@ -1,3 +1,4 @@
+
 def receive (no_block=False):
 	"""
 	This is the receive function implemented in every Module to communicate
@@ -23,4 +24,8 @@ def init ():
 	work correctly
 	Returns nothing
 	"""
-
+	global mysock, sockdict
+	mysock  = socket.socket(socket.AF_INET, socket, SOCK_STREAM)
+	sockdict = {}
+	
+	#for x in modules.iterkeys()[MODULE_NAME:]:
