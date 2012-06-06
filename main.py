@@ -18,22 +18,27 @@ for x in modules.iterkeys():
 
 for x in modules.iteritems():
 	name, dest = x
-	port, host, user, pwd = dest
+	port, host, user, pwd, args = dest
 
 	MODULE_NAME = name
 	MODULE_PORT = port
 	MODULE_HOST = host
 
-#For now, only load localhost modules
-#TODO: add remote capability
+	#For now, only load localhost modules
+	#TODO: add remote capability
 	if host != 'localhost':
 		continue
 	
 	pid = os.fork()
 
 	if pid == 0:
-		exec(name + "()")
-		exit()
+		execstr = name + "("
+		for x in args:
+			execstr = execstr + str(x)
+			execstr = execstr + "," 
+		execstr = execstr + ")"
+		exec(execstr)
+		
 	
 serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 serversocket.bind((MAIN_HOST, MAIN_PORT))
