@@ -6,6 +6,8 @@ def receive (no_block=False):
 	Returns the source and data
 	Returns None when no_block = true but no data is received
 	"""
+	if src == 'Test':
+		src = "STUB"
 	src = "STUB"
 	data = "STUB"
 	return (src, data)
@@ -17,6 +19,7 @@ def send (dest, data):
 	Returns False on error
 	Returns True on succes
 	"""
+		
 	return
 def init ():
 	"""
@@ -28,4 +31,4 @@ def init ():
 	mysock  = socket.socket(socket.AF_INET, socket, SOCK_STREAM)
 	sockdict = {}
 	
-	#for x in modules.iterkeys()[MODULE_NAME:]:
+#	for x in modules.iterkeys()[MODULE_NAME:]:
