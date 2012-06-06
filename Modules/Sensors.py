@@ -16,7 +16,7 @@ class Sensors:
                         "SONAR" : ""}    # "SENS SONAR <float F1> <float F2> <float F3> <float F4> <float F5> <float F6> <float F7> <float F8>"  
         
         self.running = True
-        Control.init()
+        init()
         self.receive()
         
     def receive(self):
@@ -34,8 +34,8 @@ class Sensors:
                     if not self.data[i].find("Scanner1"):
                         vals = self.data[i].split(' ')[12]
                         vals_float = vals.split(',')
-                        for float(i) in vals_float:
-                            if i < TRESHOLD:
+                        for i in vals_float:
+                            if float(i) < TRESHOLD:
                                 send("Steering", "ALERT")
                                 send("Logic", "ALERT")
                                 break
