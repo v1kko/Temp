@@ -30,8 +30,9 @@ class Sensors():
 
                 # TODO: Refactor msges
                 for i in range(len(data) - 1):
-                    if not self.data[i].find("Laser"):
-                        self.sensors["LASER"] = data[i]
+                    if not self.data[i].find("Scanner1"):
+                        string = "LASER"
+                        self.sensors["LASER"] = string.split(' ')[12].replace(',', ' ')
                         break
                     elif not self.data[i].find("Odometry"):
                         temp = self.data[i].split(' ')
@@ -43,7 +44,7 @@ class Sensors():
                         string = "SONAR"
                         # XXX: Not sure if OK
                         for i in range(8):
-                            string = string + ' ' +  temp[3 * i + 8].split('}')[0]
+                            string = string + ' ' +  temp[5 * i + 8].split('}')[0]
                         
                         self.sensors["SONAR"] = sonar[i]
                         
