@@ -1,3 +1,4 @@
+import socket
 
 def receive (no_block=False):
 	"""
