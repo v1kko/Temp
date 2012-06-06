@@ -1,57 +1,91 @@
 import socket
+from Queue import Queue
+class Control: 
+	"""
+	This class must be in the __init__ function of all modules for them to
+	work correctly and be able to use send & receive
+	"""
+	def receive (no_block=False):
+		"""
+		This is the receive function implemented in every Module to communicate
+		with other modules
+		Returns the source and data
+		Returns None when no_block = true but no data is received
+		"""
+		for name, sock in self.sockdict.iteritems():
+			ready, _, _ = select(list(sock),(),())
+			for x in ready:
+				msgqueue.put((name, ready.recv(1024)))
 
-def receive (no_block=False):
-	"""
-	This is the receive function implemented in every Module to communicate
-	with other modules
-	Returns the source and data
-	Returns None when no_block = true but no data is received
-	"""
-	if src == 'Test':
-		src = "STUB"
-	src = "STUB"
-	data = "STUB"
-	return (src, data)
-def send (dest, data):
-	"""
-	This is the send function implemented in every module to communicate
-	with other modules
-	Needs the destination and data to send
-	Returns False on error
-	Returns True on succes
-	"""
-		
-	return
-def init ():
-	"""
-	This function must be in the __init__ function of all modules for them to
-	work correctly
-	Returns nothing
-	"""
-	global mysock, sockdict
-	mysock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-	mysock.bind((MODULE_HOST, MODULE_PORT))
-	sockdict = {}
-	
-	for x in modules.iteritems()[:MODULE_NAME]:
-		name, dest = x
-		port, host, user, pwd, args = dest
-		
-		if name == MODULE_NAME:
-			continue
+		if msgqueue.empty():
+			return None
+
+		src, data = msgqueue.get()
+		if src == 'Test':
+			self.DEBUG = True
+			src, _, data = data.partition(" ")
+
+		return src, data
+
+	def send (dest, data):
+		"""
+		This is the send function implemented in every module to communicate
+		with other modules
+		Needs the destination and data to send
+		Returns False on error
+		Returns True on succes
+		"""
+		try:
+			sock = self.sockdict[dest]
+		except Keyerror:
+			return False
+
+		sock.send(data)
+		if self.DEBUG = True:
+			sock = self.sockdict['Test']
+			sock.send(data)
+
+		return True
+
+	def __init__(self, mname):
+		from config import modules, MAIN_PORT, MAIN_HOST
+
+		self.DEBUG = False
+		self.sockdict = {}
+		self.msgqueue = Queue()
+		#Find the right name and information of the module
+		for name, port, host, user, pwd, args in modules.itervalues():
+			if name == mname:
+				self.MODULE_HOST = host
+				self.MODULE_PORT = port
+				self.MODULE_NAME = name
+			self.sockdict[name] = ''
+		self.mysock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		self.mysock.bind((self.MODULE_HOST, self.MODULE_PORT))
+		self.mysock.listen(len(modules))
+
+		#Send & get OK from main
 		clientsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-		clientsocket.connect((host, port))
-		clientsocket.send(MODULE_NAME)
-		sockdict[name] = clientsocket
-	
-	#Wait for response of every module
-	while True: 
-		for x in socketlist.itervalues():
-			if x == '':
-				break;
-		else:
-			break
+		clientsocket.connect((MAIN_HOST, MAIN_PORT))
+		clientsocket.send(self.MODULE_NAME)
+		self.sockdict['main'] = clientsocket
+
+		#connect to the modules you should connect to
+		for name, port, host, user, pwd, args in modules.itervalues():
+			if name == self.MODULE_NAME:
+				break
+			clientsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+			clientsocket.connect((host, port))
+			clientsocket.send(self.MODULE_NAME)
+			sockdict[name] = clientsocket
 			
-		clientsocket, _ = serversocket.accept()
-		name = clientsocket.recv()
-		socketlist[name] = clientsocket
+		#Wait for response of every module
+		while True: 
+			for x in self.sockdict.itervalues():
+				if x == '':
+					break;
+			else:
+				break
+			clientsocket, _ = self.mysock.accept()
+			name = clientsocket.recv(100)
+			self.sockdict[name] = clientsocket
