@@ -38,8 +38,8 @@ for x in modules.iteritems():
 			execstr = execstr + "," 
 		execstr = execstr + ")"
 		exec(execstr)
-		
-	
+		exit(0)
+
 serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 serversocket.bind((MAIN_HOST, MAIN_PORT))
 serversocket.listen(Nmodules)
