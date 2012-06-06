@@ -14,7 +14,7 @@ import sys
 
 def receive(boolean=True):
     if boolean is True:
-        return "SRC", "ODOMETRY 0.3 0.4 0.6"
+        return "SRC", "STEER ODOMETRY 0.3 0.4 0.6"
     else:
         return "SRC", "ODOMETRY FAIL"
 
@@ -24,6 +24,10 @@ def isFloat(num):
         return True
     except ValueError:
         return False
+        
+class Test():
+    def __init__(self):
+        unittest.main()
 
 class TestSensorsRightInput(unittest.TestCase):
     
@@ -88,6 +92,5 @@ class TestSensorsWrongInput(unittest.TestCase):
         src, rcv = receive(False)
         rcv = rcv.split(" ")
         self.assertEqual(2, len(rcv))
-    
-if __name__ == "__main__": 
-    unittest.main()
+        
+S = SensorTest()
