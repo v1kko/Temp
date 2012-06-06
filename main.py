@@ -6,7 +6,7 @@ MODULE_PORT = ""
 MODULE_HOST = ""
 
 for x in modules.iterkeys():
-	exec("import  Modules." + x)
+	exec("from Modules." + x + " import *")
 
 for x in modules.iteritems():
 	name, dest = x
@@ -20,7 +20,8 @@ for x in modules.iteritems():
 #TODO: add remote capability
 	if host != 'localhost':
 		continue
-		
-	 
+	
+	pid = os.fork()
 
-
+	if pid == 0:
+		exec(name + "()")
