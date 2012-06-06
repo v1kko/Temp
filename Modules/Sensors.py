@@ -22,6 +22,7 @@ class Sensors():
         while(self.running):
             src, rcv = receive(True)
             
+            # Mine data from Bot stream
             if src == "Interface":
                 self.data = self.data + recv
 
@@ -40,10 +41,28 @@ class Sensors():
                         
                 self.data = self.data[len(data) - 1]
             
+            # Respond to msges from main
+            # TODO: respond to resets n stuff
+            elif src == "Main":
+                if rcv == "RESTART":
+                    self.running = False
+                    self.reset()
+
+            # Reply to GET
             else:
-                self.data = self.data.split(' ')
-                if self.data[0] == GET:
+                rcv = rcv.split(' ')
+                if rcv[0] == GET:
+                    # XXX: if x in y instead of try?
                     try:
-                        send(src + ' SENS ' + data[1] + ' ' + self.sensors[data[1]] )
+                        send(src + ' SENS ' + recv[1] + ' ' + self.sensors[recv[1]] )
                     except:
-                        send(src + ' SENS FAIL ' + data[1] + ' ' )
+                        send(src + ' SENS FAIL ' + recv[1] + ' ' )
+
+    # Well obviously...
+    def reset(self):
+        self.data = ""
+        for i in self.sensors.keys():
+            self.sensors[i] = ""
+            
+        self.running = True
+        self.run()
