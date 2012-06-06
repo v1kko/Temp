@@ -7,7 +7,7 @@ Purely receiving so far, not finished by any means
 
 from Control import *
 
-class Sensors():
+class Sensors:
     def __init__(self):
         self.data = ""
         
@@ -28,25 +28,40 @@ class Sensors():
 
                 self.data = self.data.split('\r\n')
 
-                # TODO: Refactor msges
                 for i in range(len(data) - 1):
+                    # LASER
                     if not self.data[i].find("Scanner1"):
-                        string = "LASER "
-                        self.sensors["LASER"] = string + self.data[i].split(' ')[12].replace(',', ' ')
-                        break
+                        vals = self.data[i].split(' ')[12]
+                        vals_float = vals.split(',')
+                        for float(i) in vals_float:
+                            if i < TRESHOLD:
+                                send("Steering", "ALERT")
+                                send("Logic", "ALERT")
+                                break
+                        else:
+                            self.sensors["LASER"] = "LASER " + self.data[i].split(' ')[12].replace(',', ' ')
+
+                    # ODOMETER
                     elif not self.data[i].find("Odometry"):
                         temp = self.data[i].split(' ')
                         vals = temp[6].split(',')
                         self.sensors["ODOMETRY"] = "ODOMETRY " + vals[0] + vals[1] + vals[2].split('}')[0]
-                        break
+
+                    # SONAR
                     elif not self.data[i].find("Sonar"):
                         temp = self.data[i].split(' ')
                         string = "SONAR"
                         # XXX: Not sure if OK
                         for i in range(8):
-                            string = string + ' ' +  temp[5 * i + 8].split('}')[0]
+                            val = temp[5 * i + 8].split('}')[0]
+                            if float(val) < TRESHOLD:
+                                send("Steering", "ALERT")
+                                send("Logic", "ALERT")
+                                break
+                            
+                            string = string + ' ' + val
                         
-                        self.sensors["SONAR"] = sonar[i]
+                        else: self.sensors["SONAR"] = string
                         
                 self.data = self.data[len(data) - 1]
             
@@ -63,12 +78,12 @@ class Sensors():
             # Reply to GET
             else:
                 rcv = rcv.split(' ')
-                if rcv[0] == GET:
+                if rcv[0] == "GET":
                     # XXX: if x in y instead of try?
                     try:
                         send(src + ' ' + self.sensors[rcv[1]] )
                     except:
-                        send(src + ' ' + rcv[1] + ' FAIL' )
+                        send(src + ' ' + rcv[1] + " FAIL" )
 
     # Well obviously...
     def reset(self):
