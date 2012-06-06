@@ -28,7 +28,7 @@ def init ():
 	Returns nothing
 	"""
 	global mysock, sockdict
-	mysock = socket.socket(socket.AF_INET, socket, SOCK_STREAM)
+	mysock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 	mysock.bind((MODULE_HOST, MODULE_PORT))
 	sockdict = {}
 	
