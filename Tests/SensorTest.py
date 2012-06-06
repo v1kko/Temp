@@ -14,7 +14,7 @@ import sys
 
 def receive(boolean=True):
     if boolean is True:
-        return "SRC", "ODOMETRY 0.3 0.4 0.2"
+        return "SRC", "ODOMETRY 0.3 0.4 0.6"
     else:
         return "SRC", "ODOMETRY FAIL"
 
@@ -30,6 +30,7 @@ class TestSensorsRightInput(unittest.TestCase):
     def testProperSensorType(self):
         """ Checking wether the second value indicates a proper sensor type """
         for i, sensType in enumerate(("ODOMETRY", "ODOMETRY", "ODOMETRY")):
+            # send("SENS", "GET " + sensType)
             src, rcv = receive()
             rcv = rcv.split(" ")
             self.assertEqual(sensType, rcv[0])
@@ -37,6 +38,7 @@ class TestSensorsRightInput(unittest.TestCase):
     def testReturnValueNumber(self):
         """ Checking the expected number of values """
         for i, sensType in enumerate(("ODOMETRY", "ODOMETRY", "ODOMETRY")):
+            # send("SENS", "GET " + sensType)
             src, rcv = receive()
             rcv = rcv.split(" ")
             
@@ -50,6 +52,7 @@ class TestSensorsRightInput(unittest.TestCase):
     def testProperSensorParameters(self):
         """ Checking per sensor type for the right amount of parameters """
         for i, sensType in enumerate(("ODOMETRY", "ODOMETRY", "ODOMETRY")):
+            # send("SENS", "GET " + sensType)
             src, rcv = receive()
             rcv = rcv.split(" ")
 
@@ -64,10 +67,24 @@ class TestSensorsRightInput(unittest.TestCase):
                     self.assertTrue(isFloat(rcv[x]))
 
 class TestSensorsWrongInput(unittest.TestCase):
-    
-    def testReturnValueNumber(self):
+    # TODO remove False from receivce paramter
+    def testUnkownSensorType(self):
         """ Checking the expected number of values """
-        #send("SENS", "GPS")
+        # send("SENS", "GET GPS")
+        src, rcv = receive(False)
+        rcv = rcv.split(" ")
+        self.assertEqual(2, len(rcv))
+        
+    def testNoSensorType(self):
+        """ Checking the expected number of values """
+        # send("SENS", " ")
+        src, rcv = receive(False)
+        rcv = rcv.split(" ")
+        self.assertEqual(2, len(rcv))
+
+    def testTooManyArguments(self):
+        """ Checking the expected number of values """
+        # send("SENS", "GET GPS PLUS MORE ARGUMENTS")
         src, rcv = receive(False)
         rcv = rcv.split(" ")
         self.assertEqual(2, len(rcv))
