@@ -5,7 +5,7 @@ Sensors.py
 Purely receiving so far, not finished by any means
 """
 
-from control import *
+from Control import *
 
 class Sensors():
     def __init__(self):

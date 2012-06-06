@@ -2,12 +2,14 @@ import os
 import socket
 import select
 from config import *
-
+"""
+This is the main function.
+It reads its input from config.py
+It also has the ability to stop other processes and restart them might they fail
+"""
 MODULE_NAME = "" 
 MODULE_PORT = ""
 MODULE_HOST = ""
-MAIN_PORT = 12341
-MAIN_HOST = 'localhost'
 
 Nmodules = len(modules)
 
@@ -30,13 +32,12 @@ for x in modules.iteritems():
 	pid = os.fork()
 
 	if pid == 0:
-		#exec(name + "()")
+		exec(name + "()")
 		exit()
 	
 serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 serversocket.bind((MAIN_HOST, MAIN_PORT))
-
-serversocket.listen(5)
+serversocket.listen(Nmodules)
 
 socketlist = {}
 for x in modules.iterkeys():
