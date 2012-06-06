@@ -12,9 +12,11 @@ import sys
 #from Control import *
 #import Sensors
 
-def receive(no_block=False):
-    return "SRC", "FAIL ODOMETRY 4.6 3.5 2.3"
-    
+def receive(boolean=True):
+    if boolean is True:
+        return "SRC", "ODOMETRY 0.3 0.4 0.2"
+    else:
+        return "SRC", "ODOMETRY FAIL"
 
 def isFloat(num):
     try:
@@ -25,62 +27,50 @@ def isFloat(num):
 
 class TestSensorsRightInput(unittest.TestCase):
     
-    def testMinimumNumberReturnValues(self):
-        """ Checking the minimum number of expected values received """
-        src, rcv = receive()
-        rcv = rcv.split(" ")
-        self.assertTrue(len(rcv) >= 3)
-    
     def testProperSensorType(self):
         """ Checking wether the second value indicates a proper sensor type """
-        sensors = ['LASER', 'ODOMETRY', 'SONAR']
-        src, rcv = receive()
-        rcv = rcv.split(" ")
-        self.assertTrue(rcv[1] in sensors)
+        for i, sensType in enumerate(("ODOMETRY", "ODOMETRY", "ODOMETRY")):
+            src, rcv = receive()
+            rcv = rcv.split(" ")
+            self.assertEqual(sensType, rcv[0])
 
     def testReturnValueNumber(self):
         """ Checking the expected number of values """
-        src, rcv = receive()
-        rcv = rcv.split(" ")
-        sensType = rcv[1]
-        
-        if sensType == 'LASER':
-            # TODO: insert right number of parameters
-            self.assertEqual(5, len(rcv))
-        elif sensType ==  'ODOMETRY':
-            self.assertEqual(5, len(rcv))
-        elif sensType == 'SONAR':
-            # TODO: insert right number of parameters
-            self.assertEqual(5, len(rcv))
+        for i, sensType in enumerate(("ODOMETRY", "ODOMETRY", "ODOMETRY")):
+            src, rcv = receive()
+            rcv = rcv.split(" ")
+            
+            if sensType == 'LASER':
+                self.assertEqual(181, len(rcv))
+            elif sensType ==  'ODOMETRY':
+                self.assertEqual(4, len(rcv))
+            elif sensType == 'SONAR':
+                self.assertEqual(9, len(rcv))
             
     def testProperSensorParameters(self):
         """ Checking per sensor type for the right amount of parameters """
-        src, rcv = receive()
-        rcv = rcv.split(" ")
-        sensType = rcv[1]
-        
-        if sensType == 'LASER':
-            # TODO: insert right number of parameters
-            for x in range(2, len(rcv)):  
-                self.assertTrue(isFloat(rcv[x]))
-        elif sensType ==  'ODOMETRY':
-            for x in range(2, len(rcv)):  
-                self.assertTrue(isFloat(rcv[x]))
-        elif sensType == 'SONAR':
-            # TODO: insert right number of parameters
-            for x in range(2, len(rcv)):  
-                self.assertTrue(isFloat(rcv[x]))
+        for i, sensType in enumerate(("ODOMETRY", "ODOMETRY", "ODOMETRY")):
+            src, rcv = receive()
+            rcv = rcv.split(" ")
+
+            if sensType == 'LASER':
+                for x in range(1, len(rcv)):  
+                    self.assertTrue(isFloat(rcv[x]))
+            elif sensType ==  'ODOMETRY':
+                for x in range(1, len(rcv)):  
+                    self.assertTrue(isFloat(rcv[x]))
+            elif sensType == 'SONAR':
+                for x in range(1, len(rcv)):  
+                    self.assertTrue(isFloat(rcv[x]))
 
 class TestSensorsWrongInput(unittest.TestCase):
     
     def testReturnValueNumber(self):
         """ Checking the expected number of values """
-        src, rcv = receive()
+        #send("SENS", "GPS")
+        src, rcv = receive(False)
         rcv = rcv.split(" ")
         self.assertEqual(2, len(rcv))
     
-    def testWrongInput(self):
-        self.assertTrue(False)
-
-if __name__ == "__main__":  
-    unittest.main()  
+if __name__ == "__main__": 
+    unittest.main()
