@@ -7,9 +7,8 @@ This is the main function.
 It reads its input from config.py
 It also has the ability to stop other processes and restart them might they fail
 """
-MODULE_NAME = "" 
-MODULE_PORT = ""
-MODULE_HOST = ""
+
+global MODULE_NAME, MODULE_PORT, MODULE_HOST
 
 Nmodules = len(modules)
 
