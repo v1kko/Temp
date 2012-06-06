@@ -16,7 +16,7 @@ class Sensors:
                         "SONAR" : ""}    # "SENS SONAR <float F1> <float F2> <float F3> <float F4> <float F5> <float F6> <float F7> <float F8>"  
         
         self.running = True
-		Control.init()
+        Control.init()
         self.receive()
         
     def receive(self):
