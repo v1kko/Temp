@@ -10,6 +10,7 @@ It also has the ability to stop other processes and restart them might they fail
 """
 
 serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+serversocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 serversocket.bind((MAIN_HOST, MAIN_PORT))
 serversocket.listen(len(modules))
 

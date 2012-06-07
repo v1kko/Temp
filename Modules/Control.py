@@ -64,6 +64,7 @@ class Control:
 			else:
 				self.sockdict[name] = ''
 		self.mysock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		self.mysock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 		self.mysock.bind((self.MODULE_HOST, self.MODULE_PORT))
 		self.mysock.listen(len(modules))
 
