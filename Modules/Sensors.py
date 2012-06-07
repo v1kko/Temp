@@ -3,6 +3,8 @@
 Sensors.py
 
 Purely receiving so far, not finished by any means
+
+Ugly code that is commented out >> Alert.py
 """
 
 from Control import *
@@ -32,15 +34,15 @@ class Sensors:
                 for i in range(len(data) - 1):
                     # LASER
                     if not self.data[i].find("Scanner1"):
-                        vals = self.data[i].split(' ')[12]
-                        vals_float = vals.split(',')
-                        for i in vals_float:
-                            if float(i) < TRESHOLD:
-                                send("Steering", "ALERT")
-                                send("Logic", "ALERT")
-                                break
-                        else:
-                            self.sensors["LASER"] = "LASER " + self.data[i].split(' ')[12].replace(',', ' ')
+                        #vals = self.data[i].split(' ')[12]
+                        #vals_float = vals.split(',')
+                        #for i in vals_float:
+                        #    if float(i) < TRESHOLD:
+                        #        send("Steering", "ALERT")
+                        #        send("Logic", "ALERT")
+                        #        break
+                        #else:
+                        self.sensors["LASER"] = "LASER " + self.data[i].split(' ')[12].replace(',', ' ')
 
                     # ODOMETER
                     elif not self.data[i].find("Odometry"):
@@ -55,14 +57,15 @@ class Sensors:
                         # XXX: Not sure if OK
                         for i in range(8):
                             val = temp[5 * i + 8].split('}')[0]
-                            if float(val) < TRESHOLD:
-                                send("Steering", "ALERT")
-                                send("Logic", "ALERT")
-                                break
-                            
+                        #    if float(val) < TRESHOLD:
+                        #        send("Steering", "ALERT")
+                        #        send("Logic", "ALERT")
+                        #        break
+                        #    
                             string = string + ' ' + val
-                        
-                        else: self.sensors["SONAR"] = string
+                        #
+                        #else:
+                        self.sensors["SONAR"] = string
                         
                 self.data = self.data[len(data) - 1]
             
