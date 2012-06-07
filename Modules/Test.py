@@ -28,7 +28,11 @@ class Test():
         #Control.init()
         global ctrl
         ctrl = Control(self.__class__.__name__)
-        unittest.main(verbosity=2)
+        
+        try:
+            unittest.main(verbosity=2)
+        except TypeError:
+            exit(0)
 
 class TestSensorsRightInput(unittest.TestCase):
     
