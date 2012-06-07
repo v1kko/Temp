@@ -14,14 +14,9 @@ from Queue import Queue
 from re import match
 import math
 import Control
-"""
-  wat hij doet
-  parameters per parameter
-  wat hij 
-"""
-
 
 class Steering:
+    #Start up the module
     def __init__(self, grid_size = 1.0):
         self.ctrl = Control.Control(self.__class__.__name__)
         self.stop_signal = False
@@ -34,24 +29,32 @@ class Steering:
         self.receive()
         exit(0)
 
-
+    # @note: Receive and handle messages (and make sure you can handle
+    #  'incorrect' messages)
     def receive(self):
+        #For a stop signal we'd drop our regular work
         while not self.stop_signal:
             recv = self.ctrl.receive()
+            #Ignore empty messages, start listening again
             if recv == None:
                 continue
             self.__active_task, data = recv
             data = data.upper()
+            #If it is a signal and it returns True we don't put anything else 
+            #into the queue and flush it ##########are we warning the robot to stop
             if self.__hard_signal(data):
                 continue
+            #Otherwise, add the received command to the queue
             else:
                 self.__command_queue.put(recv)
 
+            #Time to check whether the command adhers to protocol##
             self.__active_task, data = self.__command_queue.get()
             data = data.upper()
             if match('^FAIL\ .*$', data):
                 #TODO: Error handling
                 pass
+            #Check whether you receive a float/int when you expect to
             elif not match('^(MOVE|TURN\ [0-9]+(\.[0-9]+)?|\.[0-9]+)|' + \
                            '(SET\ MOVE|TURN)\ [0-9]+(\.[0-9]+)?|\.[0-9]+$', data):
                 self.ctrl.send(self.__active_task, 
@@ -61,8 +64,14 @@ class Steering:
                 load, cast1, cast2 = self.__FUNCS[func]
                 load(cast1(parm1), cast2(parm2))
 
-
+    # @note: Handle signals of various types.
+    #  ALARM: robot is about to crash into something, stop
+    #  STOP: The module is told to stop
+    #  ISEMPTY: Tell the testmodule the data was empty
+    # @param: str $data Can be types ALARM, STOP or ISEMPTY
+    # @return: bool If True the robot will be told to stop in its tracks
     def __hard_signal(self, data):
+        #Returning True will stop the robot in its tracks
         if data == 'ALARM':
             self.__flush()
             self.ctrl.send(self.__active_task, 'FAIL Alarm signal received')
@@ -74,7 +83,8 @@ class Steering:
             self.ctrl.send('Test', 'ISEMPTY %r' % (self.__command_queue.empty()))
         return False
 
-
+    # @note: Set the size of a single step forward in MOVE
+    # @param str $set_type The type to change (can only be MOVE now)
     def add(self, set_type, step_size):
         if set_type.upper() == 'MOVE':
             self.grid_size = step_size
