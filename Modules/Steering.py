@@ -45,7 +45,7 @@ class Steering:
 
             self.__active_task, data = self.__command_queue.get()
             data = data.upper()
-            if match('^FAIL\ $', data):
+            if match('^FAIL\ .*$', data):
                 #TODO: Error handling
                 pass
             elif not match('^(MOVE|TURN\ [0-9]+(\.[0-9]+)?|\.[0-9]+)|' + \
@@ -66,6 +66,8 @@ class Steering:
         elif data == 'STOP':
             self.stop_signal = True
             return True
+        elif data == 'ISEMPTY':
+            self.ctrl.send('Test', 'ISEMPTY %r' % (self.__command_queue.empty()))
         return False
 
 
