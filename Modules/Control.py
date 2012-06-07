@@ -1,11 +1,13 @@
 import socket
+import select
 from Queue import Queue
+
 class Control: 
 	"""
 	This class must be in the __init__ function of all modules for them to
 	work correctly and be able to use send & receive
 	"""
-	def receive (no_block=False):
+	def receive (self, no_block=False):
 		"""
 		This is the receive function implemented in every Module to communicate
 		with other modules
@@ -15,19 +17,19 @@ class Control:
 		for name, sock in self.sockdict.iteritems():
 			ready, _, _ = select(list(sock),(),())
 			for x in ready:
-				msgqueue.put((name, ready.recv(1024)))
+				self.msgqueue.put((name, ready.recv(1024)))
 
-		if msgqueue.empty():
+		if self.msgqueue.empty():
 			return None
 
-		src, data = msgqueue.get()
+		src, data = self.msgqueue.get()
 		if src == 'Test':
 			self.DEBUG = True
 			src, _, data = data.partition(" ")
 
 		return src, data
 
-	def send (dest, data):
+	def send (self, dest, data):
 		"""
 		This is the send function implemented in every module to communicate
 		with other modules
@@ -37,11 +39,11 @@ class Control:
 		"""
 		try:
 			sock = self.sockdict[dest]
-		except Keyerror:
+		except KeyError:
 			return False
 
 		sock.send(data)
-		if self.DEBUG = True:
+		if self.DEBUG == True:
 			sock = self.sockdict['Test']
 			sock.send(data)
 
@@ -77,7 +79,7 @@ class Control:
 			clientsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 			clientsocket.connect((host, port))
 			clientsocket.send(self.MODULE_NAME)
-			sockdict[name] = clientsocket
+			self.sockdict[name] = clientsocket
 			
 		#Wait for response of every module
 		while True: 
