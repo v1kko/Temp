@@ -14,13 +14,13 @@ class Control:
 		Returns the source and data
 		Returns None when no_block = true but no data is received
 		"""
-		for name, sock in self.sockdict.iteritems():
-			ready, _, _ = select([sock], [], [], 0)
-			for x in ready:
-				self.msgqueue.put((name, x.recv(1024)))
-
-		if self.msgqueue.empty():
-			return None
+		while True:
+			for name, sock in self.sockdict.iteritems():
+				ready, _, _ = select([sock], [], [], 0.05)
+				for x in ready:
+					self.msgqueue.put((name, x.recv(1024)))
+			if self.msgqueue.empty() and no_block:
+				return None
 
 		src, data = self.msgqueue.get()
 		if src == 'Test':
@@ -37,6 +37,7 @@ class Control:
 		Returns False on error
 		Returns True on succes
 		"""
+		print dest + ', ' + data
 		try:
 			sock = self.sockdict[dest]
 		except KeyError:
