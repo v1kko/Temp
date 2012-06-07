@@ -50,7 +50,8 @@ class Steering:
                 pass
             elif not match('^(MOVE|TURN\ [0-9]+(\.[0-9]+)?|\.[0-9]+)|' + \
                            '(SET\ MOVE|TURN)\ [0-9]+(\.[0-9]+)?|\.[0-9]+$', data):
-                self.ctrl.send(self.__active_task, 'FAIL Unknown message format')
+                self.ctrl.send(self.__active_task, 
+                               'FAIL Unknown message format: %s' % (data))
             else:
                 func, parm1, parm2 = data.split()
                 load, cast1, cast2 = self.__FUNCS[func]
@@ -70,9 +71,7 @@ class Steering:
 
     def add(self, set_type, step_size):
         if set_type.upper() == 'MOVE':
-            self.step_dist = step_size
-        elif set_type.upper() == 'TURN':
-            self.step_angle = step_size
+            self.grid_size = step_size
 
 
     def move(self, speed, distance):    
