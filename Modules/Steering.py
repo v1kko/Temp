@@ -44,14 +44,14 @@ class Steering:
             self.__active_task, data = recv
             data = data.upper()
             #If it is a signal and it returns True we don't put anything else 
-            #into the queue and flush it ##########are we warning the robot to stop
+            #into the queue and flush it
             if self.__hard_signal(data):
                 continue
             #Otherwise, add the received command to the queue
             else:
                 self.__command_queue.put(recv)
 
-            #Time to check whether the command adhers to protocol##
+            #Time to check whether the command adheres to protocol
             self.__active_task, data = self.__command_queue.get()
             data = data.upper()
             if match('^FAIL\ .*$', data):
@@ -64,8 +64,8 @@ class Steering:
                 continue
 
             #Check whether you receive a float/int when you expect to
-            elif not match('^(MOVE|TURN\ [0-9]+(\.[0-9]+)?|\.[0-9]+)|' + \
-                           '(SET\ MOVE|TURN)\ [0-9]+(\.[0-9]+)?|\.[0-9]+$', data):
+            elif not match('^(MOVE|TURN\ -?[0-9]+(\.[0-9]+)?|\.[0-9]+)|' + \
+                           '(SET\ MOVE|TURN)\ -?[0-9]+(\.[0-9]+)?|\.[0-9]+$', data):
                 self.ctrl.send(self.__active_task, 
                                'FAIL Unknown message format: %s' % (data))
             else:
@@ -74,12 +74,12 @@ class Steering:
                 load(cast1(parm1), cast2(parm2))
 
 
-    # @note: Handle signals of various types.
-    #  ALARM: robot is about to crash into something, stop
+    # @note: Handle (very) urgent signals.
+    #  ALARM: robot is about to crash into something, freeze robot
     #  STOP: The module is told to stop
-    #  ISEMPTY: Tell the testmodule the data was empty
-    # @param: str $data Can be types ALARM, STOP or ISEMPTY
-    # @return: bool If True the robot will be told to stop in its tracks
+    #  ISEMPTY: Tell the test module whether the command queue is empty or not
+    # @param data: Can be types ALARM, STOP or ISEMPTY
+    # @return: boolean If True the robot will be told to stop in its tracks
     def __hard_signal(self, data):
         #Returning True will stop the robot in its tracks
         if data == 'ALARM':
@@ -94,8 +94,9 @@ class Steering:
         return False
 
 
-    # @note: Set the size of a single step forward in MOVE
-    # @param str $set_type The type to change (can only be MOVE now)
+    # @note: Set the size of a single step forward in $step_size
+    # @param set_type: The type to change (can only be MOVE now)
+    # @param step_size: The step size as a float
     def add(self, set_type, step_size):
         if set_type.upper() == 'MOVE':
             self.grid_size = step_size
@@ -105,8 +106,8 @@ class Steering:
     #  If odometry is None: stop the robot and inform the calling task
     #  Note that if parameters aren't floats/ints your command won't be executed
     #  If the command was executed succesfully it will inform the calling task
-    # @param: float $speed The speed at which to move the robot
-    # @param: float $distance The distance the robot should move
+    # @param speed: The speed at which to move the robot
+    # @param distance: The distance the robot should move
     def move(self, speed, distance):
         grid_dist = distance * distance * self.grid_size
         start = True
@@ -150,8 +151,8 @@ class Steering:
     #  If odometry is None: stop the robot and inform the calling task
     #  Note that if parameters aren't floats/ints your command won't be executed
     #  If the command was executed succesfully it will inform the calling task
-    # @param: float $speed The speed at which to turn the robot
-    # @param: float $angle The angle in degrees the robot should turn:
+    # @param speed: The speed at which to turn the robot
+    # @param angle: The angle in degrees the robot should turn:
     #  A positive angle means turning right, a negative one turning left
     def turn(self, speed, angle):
         start = True
@@ -212,6 +213,10 @@ class Steering:
     #  If the queue is full, a value expected to be a float is not a number or
     #  no message is received we send an error message and continue with the 
     #  rest of the program
+    # @return: tuple: (float x, float y, float theta), where the x and y axes
+    #  coordinates mark the estimated position of the robot with respect to
+    #  the start position. Theta defines the current angle of the robot with
+    #  respect to the start angle.
     def __odometry(self):
         #Try to send a request for getting the odometry sensor's values
         if not self.ctrl.send('Sensors', 'GET ODOMETRY'):
@@ -234,8 +239,8 @@ class Steering:
                 continue
             #Check whether you received a float/int
             if module == 'SENSORS' and match('^ODOMETRY\ ' + \
-                '([0-9]+(\.[0-9]+)?|\.[0-9]+\ ){2}' + \
-                '[0-9]+(\.[0-9]+)?|\.[0-9]+$', data):
+                '(-?[0-9]+(\.[0-9]+)?|\.[0-9]+\ ){2}' + \
+                '-?[0-9]+(\.[0-9]+)?|\.[0-9]+$', data):
                 return map(float, data.split(None)[1:4])
             else:
                 #If the queue is full, inform the task calling you of it and
