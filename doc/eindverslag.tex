@@ -60,7 +60,7 @@ Thomas Schoegje \\ \url{Thomas.Schoegje@student.uva.nl} \\10068767}
 \section*{Functioneel ontwerp}
   \begin{figure}[h!]
     \centering
-      \includegraphics[scale=1]{eenplaatjemetheelduidelijkeuitleg.png}
+      \includegraphics[scale=0.7]{eenplaatjemetheelduidelijkeuitleg.png}
     \caption{Het functionele ontwerp van onze implementatie.}
   \end{figure}
 
@@ -81,7 +81,7 @@ Thomas Schoegje \\ \url{Thomas.Schoegje@student.uva.nl} \\10068767}
   opdrachten naar de aansturing te versturen. Tenslotte stuurt de aansturing deze langs de 'vertaling' van de 
   Interface-laag naar de robot om deze zo te laten reageren op zijn opgeving.
   
-
+\clearpage
 \section*{Implementatiekeuzes}
   De omgeving zullen we in kaart brengen als een twee-dimensionaal grid waar de cellen verschillende waarden kunnen
   hebben voor begaanbaar terrein of verschillende soorten oppervlakten. We kunnen ons limiteren tot een twee-
@@ -89,6 +89,19 @@ Thomas Schoegje \\ \url{Thomas.Schoegje@student.uva.nl} \\10068767}
   arena's zijn niet beschikbaar gesteld. Wanneer de robot toch merkt dat er sprake is van een hoogteverschil zoals
   bij een enkele helling in de gele arena zal hij dit markeren als ontoegankelijk en teruggaan naar waar hij 
   vandaan kwam. Let op dat hij zich niet enkel in de cellen kan bewegen, maar dat hij de kaart wel zo onthoudt.
+
+  Voor het bijhouden van de huidige positie gebruiken we de odometer in plaats van bijvoorbeeld bij te
+  houden hoeveel de wiel gedraaid is. Dit houdt namelijk gemakkelijk de positie ten opzichte van het beginpunt bij
+  op een manier die te combineren is met de manier waarop we de kaart gaan bijhouden.
+
+  Vanuit de main module (binnen de logica module) worden andere modulen opgestart en pas zodra al deze modulen
+  aan de main hebben gemeldt
+  dat ze klaar zijn verteld de main tegen ze allemaal dat ze mogen beginnen. Er wordt ook binnen de logica-module
+  bijgehouden of een module (onverwacht) offline gaat en indien dit het geval is worden alle andere modulen hiervan
+  op de hoogte gesteld en worden ze gepauzeerd of herstart zodra de gebroken module weer klaar is om te starten. De robot gaat
+  ook stilstaan terwijl dit afgehandeld wordt, en hoewel enkele modulen volledig herstart kunnen worden willen we
+  onder andere de kaart en de positie natuurlijk intact houden.
+
 
   We voor Python gekozen als programmeertaal omdat we hierin efficient kunnen werken terwijl we dankzij de
   klassen ook makkelijk aan verschillende modulen tegelijk kunnen werken. Het is een
@@ -111,7 +124,8 @@ Thomas Schoegje \\ \url{Thomas.Schoegje@student.uva.nl} \\10068767}
   testen bijvoorbeeld GPS waarden gebruiken als ground truth om te kijken hoe nauwkeurig we de positie van onze
   robot weergeven.
 
-\section*{Werkplan}
+  \clearpage
+\section*{Tijdsindeling}
   \subsection*{Week 1}
     Doelstellingen:
     \begin{itemize}
@@ -127,9 +141,10 @@ Thomas Schoegje \\ \url{Thomas.Schoegje@student.uva.nl} \\10068767}
     \begin{itemize}
         \item Skelet programma - \emph{Victor}
         \item Interpreteren sensoren - \emph{Arjen}
-        \item Aansturen robot - \emph{C\'edric en Thomas}
+        \item Aansturen robot - \emph{C\'edric met wat hulp van Thomas}
         \item Testmodules - \emph{Timothy}
-        \item Verslaggeving - \emph{Thomas}
+        \item Interface tussen robot en rest programma - \emph{Thomas}
+        \item Algemene verslaggeving - \emph{Thomas}
     \end{itemize}
     
   \subsection*{Week 2}
@@ -171,7 +186,7 @@ Thomas Schoegje \\ \url{Thomas.Schoegje@student.uva.nl} \\10068767}
     \end{itemize}
     Werkverdeling:
     \begin{itemize}
-        \item \emph{TBA}
+        \item \emph{TBA}\\\\
     \end{itemize}
     
 \section*{Discussie opgave}
