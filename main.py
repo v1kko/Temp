@@ -1,6 +1,7 @@
 import os
 import socket
 import select
+from multiprocessing import Process
 from config import *
 """
 This is the main function.
@@ -8,40 +9,20 @@ It reads its input from config.py
 It also has the ability to stop other processes and restart them might they fail
 """
 
-global MODULE_NAME, MODULE_PORT, MODULE_HOST
+serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+serversocket.bind((MAIN_HOST, MAIN_PORT))
+serversocket.listen(len(modules))
 
-Nmodules = len(modules)
-
-for x in modules.iterkeys():
-	exec("from Modules." + x + " import *")
-
-for x in modules.iteritems():
-	name, dest = x
-	port, host, user, pwd, args = dest
-
-	MODULE_NAME = name
-	MODULE_PORT = port
-	MODULE_HOST = host
+for module, dest in modules.iteritems():
+	name, port, host, user, pwd, args = dest
 
 	#For now, only load localhost modules
 	#TODO: add remote capability
 	if host != 'localhost':
 		continue
 	
-	pid = os.fork()
-
-	if pid == 0:
-		execstr = name + "("
-		for x in args:
-			execstr = execstr + str(x)
-			execstr = execstr + "," 
-		execstr = execstr + ")"
-		exec(execstr)
-		exit(0)
-
-serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-serversocket.bind((MAIN_HOST, MAIN_PORT))
-serversocket.listen(Nmodules)
+	child = Process(target=module, args=args)
+	child.start()
 
 socketlist = {}
 for x in modules.iterkeys():
@@ -56,7 +37,7 @@ while True:
 		break
 		
 	clientsocket, _ = serversocket.accept()
-	name = clientsocket.recv()
+	name = clientsocket.recv(100)
 	socketlist[name] = clientsocket
 
 #Send start to every module
