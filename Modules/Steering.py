@@ -48,6 +48,9 @@ class Steering:
             if match('^FAIL\ .*$', data):
                 #TODO: Error handling
                 pass
+            elif data == 'GRIDSIZE':
+                self.ctrl.send(self.__active_task, 'GRIDSIZE %f' % self.grid_size)
+                continue
             elif not match('^(MOVE|TURN\ [0-9]+(\.[0-9]+)?|\.[0-9]+)|' + \
                            '(SET\ MOVE|TURN)\ [0-9]+(\.[0-9]+)?|\.[0-9]+$', data):
                 self.ctrl.send(self.__active_task, 
