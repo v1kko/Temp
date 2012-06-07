@@ -2,13 +2,14 @@
 """
 Sensors.py
 
-Purely receiving so far, not finished by any means
+TODO: Comments
 """
 
 from Control import *
 
 class Sensors:
     def __init__(self):
+        self.ctrl = Control(self.__class__.__name__)
         self.data = ""
         
         self.sensors = {"LASER" : "",    # "SENS LASER"
@@ -16,12 +17,11 @@ class Sensors:
                         "SONAR" : ""}    # "SENS SONAR <float F1> <float F2> <float F3> <float F4> <float F5> <float F6> <float F7> <float F8>"  
         
         self.running = True
-        init()
         self.receive()
         
     def receive(self):
         while(self.running):
-            src, rcv = receive(True)
+            src, rcv = self.ctrl.receive(True)
             
             # Mine data from Bot stream
             if src == "Interface":
@@ -32,15 +32,7 @@ class Sensors:
                 for i in range(len(data) - 1):
                     # LASER
                     if not self.data[i].find("Scanner1"):
-                        vals = self.data[i].split(' ')[12]
-                        vals_float = vals.split(',')
-                        for i in vals_float:
-                            if float(i) < TRESHOLD:
-                                send("Steering", "ALERT")
-                                send("Logic", "ALERT")
-                                break
-                        else:
-                            self.sensors["LASER"] = "LASER " + self.data[i].split(' ')[12].replace(',', ' ')
+                        self.sensors["LASER"] = "LASER " + self.data[i].split(' ')[12].replace(',', ' ')
 
                     # ODOMETER
                     elif not self.data[i].find("Odometry"):
@@ -55,14 +47,8 @@ class Sensors:
                         # XXX: Not sure if OK
                         for i in range(8):
                             val = temp[5 * i + 8].split('}')[0]
-                            if float(val) < TRESHOLD:
-                                send("Steering", "ALERT")
-                                send("Logic", "ALERT")
-                                break
-                            
                             string = string + ' ' + val
-                        
-                        else: self.sensors["SONAR"] = string
+                        self.sensors["SONAR"] = string
                         
                 self.data = self.data[len(data) - 1]
             
@@ -82,9 +68,9 @@ class Sensors:
                 if rcv[0] == "GET":
                     # XXX: if x in y instead of try?
                     try:
-                        send(src + ' ' + self.sensors[rcv[1]] )
+                        self.ctrl.send(src + ' ' + self.sensors[rcv[1]] )
                     except:
-                        send(src + ' ' + rcv[1] + " FAIL" )
+                        self.ctrl.send(src + ' ' + rcv[1] + " FAIL" )
 
     # Well obviously...
     def reset(self):
