@@ -40,23 +40,22 @@ class TestSensorsRightInput(unittest.TestCase):
         time.sleep(1)
         reply = ctrl.receive(True)
         self.assertTrue(reply is not None)
-
-        return reply
-    
+        src, rcv = reply
+        rcv = rcv.split(" ")
+        return rcv
+        
     def testProperSensorType(self):
         """ Checking wether the second value indicates a proper sensor type """
         for i, sensType in enumerate(("LASER", "ODOMETRY", "SONAR")):
             ctrl.send("Sensors", "Steering GET " + sensType)
-            src, rcv = self.sleepAndGetInput()
-            rcv = rcv.split(" ")
+            rcv = self.sleepAndGetInput()
             self.assertEqual(sensType, rcv[1])
 
     def testReturnValueNumber(self):
         """ Checking the expected number of values """
         for i, sensType in enumerate(("LASER", "ODOMETRY", "SONAR")):
             ctrl.send("Sensors", "Steering GET " + sensType)
-            src, rcv = self.sleepAndGetInput()
-            rcv = rcv.split(" ")
+            rcv = self.sleepAndGetInput()
             
             if sensType == 'LASER':
                 self.assertEqual(183, len(rcv))
@@ -69,8 +68,7 @@ class TestSensorsRightInput(unittest.TestCase):
         """ Checking per sensor type for the right amount of parameters """
         for i, sensType in enumerate(("LASER", "ODOMETRY", "SONAR")):
             ctrl.send("Sensors", "Steering GET " + sensType)
-            src, rcv = self.sleepAndGetInput()
-            rcv = rcv.split(" ")
+            rcv = self.sleepAndGetInput()
 
             if sensType == 'LASER':
                 for x in range(2, len(rcv)):  
@@ -89,25 +87,26 @@ class TestSensorsWrongInput(unittest.TestCase):
         time.sleep(1)
         reply = ctrl.receive(True)
         self.assertTrue(reply is not None)
-        return reply
+        src, rcv = reply
+        rcv = rcv.split(" ")
+        return rcv
         
     def testUnkownSensorType(self):
         """ Checking the expected number of values """
         ctrl.send("Sensors", "Steering GET GPS")
-        src, rcv = self.sleepAndGetInput()
-        rcv = rcv.split(" ")
+        rcv = self.sleepAndGetInput()
         self.assertEqual(3, len(rcv))
         
     def testNoSensorType(self):
         """ Checking the expected number of values """
         ctrl.send("Sensors", "Steering ")
-        src, rcv = self.sleepAndGetInput()
-        rcv = rcv.split(" ")
+        rcv = self.sleepAndGetInput()
         self.assertEqual(3, len(rcv))
 
     def testTooManyArguments(self):
         """ Checking the expected number of values """
         ctrl.send("Sensors", "Steering GET GPS PLUS MORE ARGUMENTS")
-        src, rcv = self.sleepAndGetInput()
-        rcv = rcv.split(" ")
+        rcv = self.sleepAndGetInput()
         self.assertEqual(3, len(rcv))
+
+#S = Test()
