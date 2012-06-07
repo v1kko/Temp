@@ -10,6 +10,7 @@ It also has the ability to stop other processes and restart them might they fail
 """
 
 serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+serversocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 serversocket.bind((MAIN_HOST, MAIN_PORT))
 serversocket.listen(len(modules))
 
@@ -25,8 +26,8 @@ for module, dest in modules.iteritems():
 	child.start()
 
 socketlist = {}
-for x in modules.iterkeys():
-	socketlist[x] = ''
+for name, _, _, _, _, _ in modules.itervalues():
+	socketlist[name] = ''
 
 #Wait for response of every module
 while True: 
@@ -38,8 +39,12 @@ while True:
 		
 	clientsocket, _ = serversocket.accept()
 	name = clientsocket.recv(100)
+	print name + ' module is Ready'
 	socketlist[name] = clientsocket
 
 #Send start to every module
+print 'All processes ready, Starting up'
 for x in socketlist.itervalues():
 	x.send('START')
+while True:
+	pass

@@ -1,33 +1,35 @@
 import socket
+from select import select
 from Queue import Queue
+
 class Control: 
 	"""
 	This class must be in the __init__ function of all modules for them to
 	work correctly and be able to use send & receive
 	"""
-	def receive (no_block=False):
+	def receive (self, no_block=False):
 		"""
 		This is the receive function implemented in every Module to communicate
 		with other modules
 		Returns the source and data
 		Returns None when no_block = true but no data is received
 		"""
-		for name, sock in self.sockdict.iteritems():
-			ready, _, _ = select(list(sock),(),())
-			for x in ready:
-				msgqueue.put((name, ready.recv(1024)))
+		while True:
+			for name, sock in self.sockdict.iteritems():
+				ready, _, _ = select([sock], [], [], 0.05)
+				for x in ready:
+					self.msgqueue.put((name, x.recv(1024)))
+			if self.msgqueue.empty() and no_block:
+				return None
 
-		if msgqueue.empty():
-			return None
-
-		src, data = msgqueue.get()
+		src, data = self.msgqueue.get()
 		if src == 'Test':
 			self.DEBUG = True
 			src, _, data = data.partition(" ")
 
 		return src, data
 
-	def send (dest, data):
+	def send (self, dest, data):
 		"""
 		This is the send function implemented in every module to communicate
 		with other modules
@@ -35,13 +37,14 @@ class Control:
 		Returns False on error
 		Returns True on succes
 		"""
+		print dest + ', ' + data
 		try:
 			sock = self.sockdict[dest]
-		except Keyerror:
+		except KeyError:
 			return False
 
 		sock.send(data)
-		if self.DEBUG = True:
+		if self.DEBUG == True:
 			sock = self.sockdict['Test']
 			sock.send(data)
 
@@ -59,8 +62,10 @@ class Control:
 				self.MODULE_HOST = host
 				self.MODULE_PORT = port
 				self.MODULE_NAME = name
-			self.sockdict[name] = ''
+			else:
+				self.sockdict[name] = ''
 		self.mysock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		self.mysock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 		self.mysock.bind((self.MODULE_HOST, self.MODULE_PORT))
 		self.mysock.listen(len(modules))
 
@@ -69,6 +74,8 @@ class Control:
 		clientsocket.connect((MAIN_HOST, MAIN_PORT))
 		clientsocket.send(self.MODULE_NAME)
 		self.sockdict['main'] = clientsocket
+		while clientsocket.recv(1024) != 'START':
+			pass
 
 		#connect to the modules you should connect to
 		for name, port, host, user, pwd, args in modules.itervalues():
@@ -77,7 +84,7 @@ class Control:
 			clientsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 			clientsocket.connect((host, port))
 			clientsocket.send(self.MODULE_NAME)
-			sockdict[name] = clientsocket
+			self.sockdict[name] = clientsocket
 			
 		#Wait for response of every module
 		while True: 
