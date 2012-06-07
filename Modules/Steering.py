@@ -3,7 +3,11 @@
 @author: Cedric Blom
 @version: 1.0
 
-@summary: 
+@summary: This program translates relative robot "MOVE" and "TURN" instructions 
+in wheel rotation instructions. Instructions are executed in a FIFO order.
+Instructions will either be completely executed or it fails. A failure will
+always trigger a emergency stop followed by a FAIL message with detailed
+information about the failure reason.
 '''
 
 from Queue import Queue
@@ -14,15 +18,17 @@ import Control
 
 
 class Steering:
-    def __init__(self):
+    def __init__(self, grid_size = 1.0):
         Control.init()
         self.stop_signal = False
+        self.grid_size = grid_size
         self.__command_queue = Queue()
         self.__active_task = ''
         self.__FUNCS = {'SET' : (self.add, str, float),
                         'MOVE' : (self.move, float, float),
                         'TURN' : (self.turn, float, float)}
         self.receive()
+        exit(0)
 
 
     def receive(self):
@@ -47,7 +53,6 @@ class Steering:
                 func, parm1, parm2 = data.split()
                 load, cast1, cast2 = self.__FUNCS[func]
                 load(cast1(parm1), cast2(parm2))
-        Control.send('MAIN', 'OK')
 
 
     def __hard_signal(self, data):
@@ -57,7 +62,6 @@ class Steering:
             return True
         elif data == 'STOP':
             self.stop_signal = True
-            Control.send(self.__active_task, 'FAIL Stop signal received')
             return True
         return False
 
@@ -70,27 +74,28 @@ class Steering:
 
 
     def move(self, speed, distance):    
+        grid_dist = distance * distance * self.grid_size
         start = True
         while True:
             odo = self.__odometry()
             if not odo:
                 ins = 'DRIVE {Left %f} {Right %f}\r\n' % (0.0, 0.0)
-                Control.send('INTERFACE', ins)
+                Control.send('Interface', ins)
                 Control.send(self.__active_task, 'FAIL Robot movement aborted')
                 return
 
             if start:
                 xs, ys = odo[0:2]
                 ins = 'DRIVE {Left %f} {Right %f}\r\n' % (speed, speed)
-                Control.send('INTERFACE', ins)
+                Control.send('Interface', ins)
                 start = False
 
             xa, ya = odo[0:2]
             xr = xa - xs
             yr = ya - ys
-            if math.sqrt(xr*xr + yr*yr) >= distance:
+            if xr*xr + yr*yr >= grid_dist:
                 ins = 'DRIVE {Left %f} {Right %f}\r\n' % (0.0, 0.0)
-                Control.send('INTERFACE', ins)
+                Control.send('Interface', ins)
                 Control.send(self.__active_task, 'OK')
                 return
 
@@ -102,7 +107,7 @@ class Steering:
             odo = self.__odometry()
             if not odo:
                 ins = 'DRIVE {Left %f} {Right %f}\r\n' % (0.0, 0.0)
-                Control.send('INTERFACE', ins)
+                Control.send('Interface', ins)
                 Control.send(self.__active_task, 'FAIL Robot movement aborted')
                 return
 
@@ -113,14 +118,14 @@ class Steering:
                 else:
                     drive = (speed, -speed)
                 ins = 'DRIVE {Left %f} {Right %f}\r\n' % drive
-                Control.send('INTERFACE', ins)
+                Control.send('Interface', ins)
                 start = False
 
             ta = odo[3]
             tr = ta - ts
             if abs(tr) >= rad:
                 ins = 'DRIVE {Left %f} {Right %f}\r\n' % (0.0, 0.0)
-                Control.send('INTERFACE', ins)
+                Control.send('Interface', ins)
                 Control.send(self.__active_task, 'OK')
                 return
 
@@ -131,13 +136,13 @@ class Steering:
 
 
     def __odometry(self):
-        if not Control.send('SENSORS', 'GET ODOMETRY'):
+        if not Control.send('Sensors', 'GET ODOMETRY'):
             return
         
         while True:
             recv = Control.receive(True)
             if not recv:
-                Control.send('CONTROL', 'FAIL Expecting message from sensors')
+                Control.send('Main', 'FAIL Expecting message from sensors')
                 return
             
             module, data = map(str.upper, recv)
