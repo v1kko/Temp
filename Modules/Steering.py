@@ -15,6 +15,8 @@ from re import match
 import math
 import Control
 
+
+
 class Steering:
     #Start up the module
     def __init__(self, grid_size = 1.0):
@@ -28,6 +30,7 @@ class Steering:
                         'TURN' : (self.turn, float, float)}
         self.receive()
         exit(0)
+
 
     # @note: Receive and handle messages (and make sure you can handle
     #  'incorrect' messages)
@@ -70,6 +73,7 @@ class Steering:
                 load, cast1, cast2 = self.__FUNCS[func]
                 load(cast1(parm1), cast2(parm2))
 
+
     # @note: Handle signals of various types.
     #  ALARM: robot is about to crash into something, stop
     #  STOP: The module is told to stop
@@ -89,11 +93,13 @@ class Steering:
             self.ctrl.send('Test', 'ISEMPTY %r' % (self.__command_queue.empty()))
         return False
 
+
     # @note: Set the size of a single step forward in MOVE
     # @param str $set_type The type to change (can only be MOVE now)
     def add(self, set_type, step_size):
         if set_type.upper() == 'MOVE':
             self.grid_size = step_size
+
 
     # @note: Move the robot for a certain distance either forward or backward
     #  If odometry is None: stop the robot and inform the calling task
@@ -138,6 +144,7 @@ class Steering:
                 self.ctrl.send(self.__active_task, 'OK')
                 #End the function
                 return
+
 
     # @note: Turn the robot a certain amount of degrees at a certain speed
     #  If odometry is None: stop the robot and inform the calling task
@@ -194,10 +201,12 @@ class Steering:
                 self.ctrl.send(self.__active_task, 'OK')
                 return
 
+
     # @note: Empty the queue
     def __flush(self):
         while not self.__command_queue.empty():
             self.__command_queue.get()
+
 
     # @note: Get the odometry value
     #  If the queue is full, a value expected to be a float is not a number or
