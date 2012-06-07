@@ -152,6 +152,8 @@ class Steering:
             module, data = map(str.upper, recv)
             if self.__hard_signal(data):
                 return
+            if data == 'ISEMPTY':
+                continue
             if module == 'SENSORS' and match('^ODOMETRY\ ' + \
                 '([0-9]+(\.[0-9]+)?|\.[0-9]+\ ){2}' + \
                 '[0-9]+(\.[0-9]+)?|\.[0-9]+$', data):
