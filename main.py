@@ -25,8 +25,8 @@ for module, dest in modules.iteritems():
 	child.start()
 
 socketlist = {}
-for x in modules.iterkeys():
-	socketlist[x] = ''
+for name, _, _, _, _, _ in modules.itervalues():
+	socketlist[name] = ''
 
 #Wait for response of every module
 while True: 
@@ -38,8 +38,12 @@ while True:
 		
 	clientsocket, _ = serversocket.accept()
 	name = clientsocket.recv(100)
+	print name + ' module is Ready'
 	socketlist[name] = clientsocket
 
 #Send start to every module
+print 'All processes ready, Starting up'
 for x in socketlist.itervalues():
 	x.send('START')
+while True:
+	pass

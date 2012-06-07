@@ -21,15 +21,20 @@ class Sensors:
         
     def receive(self):
         while(self.running):
-            src, rcv = self.ctrl.receive(True)
+            rcv = self.ctrl.receive(True)
+            
+            if rcv == None:
+                break
+            else:
+                src, rcv = rcv
             
             # Mine data from Bot stream
             if src == "Interface":
-                self.data = self.data + recv
+                self.data = self.data + rcv
 
                 self.data = self.data.split('\r\n')
 
-                for i in range(len(data) - 1):
+                for i in range(len(self.data) - 1):
                     # LASER
                     if not self.data[i].find("Scanner1"):
                         self.sensors["LASER"] = "LASER " + self.data[i].split(' ')[12].replace(',', ' ')
@@ -50,7 +55,7 @@ class Sensors:
                             string = string + ' ' + val
                         self.sensors["SONAR"] = string
                         
-                self.data = self.data[len(data) - 1]
+                self.data = self.data[len(self.data) - 1]
             
             # Respond to msges from main
             # TODO: respond to resets n stuff

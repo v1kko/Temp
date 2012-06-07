@@ -1,5 +1,5 @@
 import socket
-import select
+from select import select
 from Queue import Queue
 
 class Control: 
@@ -15,9 +15,9 @@ class Control:
 		Returns None when no_block = true but no data is received
 		"""
 		for name, sock in self.sockdict.iteritems():
-			ready, _, _ = select(list(sock),(),())
+			ready, _, _ = select([sock], [], [], 0)
 			for x in ready:
-				self.msgqueue.put((name, ready.recv(1024)))
+				self.msgqueue.put((name, x.recv(1024)))
 
 		if self.msgqueue.empty():
 			return None
@@ -61,7 +61,8 @@ class Control:
 				self.MODULE_HOST = host
 				self.MODULE_PORT = port
 				self.MODULE_NAME = name
-			self.sockdict[name] = ''
+			else:
+				self.sockdict[name] = ''
 		self.mysock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		self.mysock.bind((self.MODULE_HOST, self.MODULE_PORT))
 		self.mysock.listen(len(modules))
@@ -71,6 +72,8 @@ class Control:
 		clientsocket.connect((MAIN_HOST, MAIN_PORT))
 		clientsocket.send(self.MODULE_NAME)
 		self.sockdict['main'] = clientsocket
+		while clientsocket.recv(1024) != 'START':
+			pass
 
 		#connect to the modules you should connect to
 		for name, port, host, user, pwd, args in modules.itervalues():
