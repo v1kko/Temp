@@ -47,7 +47,6 @@ class Steering:
                 func, parm1, parm2 = data.split()
                 load, cast1, cast2 = self.__FUNCS[func]
                 load(cast1(parm1), cast2(parm2))
-        Control.send('MAIN', 'OK')
 
 
     def __hard_signal(self, data):
@@ -57,7 +56,6 @@ class Steering:
             return True
         elif data == 'STOP':
             self.stop_signal = True
-            Control.send(self.__active_task, 'FAIL Stop signal received')
             return True
         return False
 
@@ -75,14 +73,14 @@ class Steering:
             odo = self.__odometry()
             if not odo:
                 ins = 'DRIVE {Left %f} {Right %f}\r\n' % (0.0, 0.0)
-                Control.send('INTERFACE', ins)
+                Control.send('Interface', ins)
                 Control.send(self.__active_task, 'FAIL Robot movement aborted')
                 return
 
             if start:
                 xs, ys = odo[0:2]
                 ins = 'DRIVE {Left %f} {Right %f}\r\n' % (speed, speed)
-                Control.send('INTERFACE', ins)
+                Control.send('Interface', ins)
                 start = False
 
             xa, ya = odo[0:2]
@@ -90,7 +88,7 @@ class Steering:
             yr = ya - ys
             if math.sqrt(xr*xr + yr*yr) >= distance:
                 ins = 'DRIVE {Left %f} {Right %f}\r\n' % (0.0, 0.0)
-                Control.send('INTERFACE', ins)
+                Control.send('Interface', ins)
                 Control.send(self.__active_task, 'OK')
                 return
 
@@ -102,7 +100,7 @@ class Steering:
             odo = self.__odometry()
             if not odo:
                 ins = 'DRIVE {Left %f} {Right %f}\r\n' % (0.0, 0.0)
-                Control.send('INTERFACE', ins)
+                Control.send('Interface', ins)
                 Control.send(self.__active_task, 'FAIL Robot movement aborted')
                 return
 
@@ -113,14 +111,14 @@ class Steering:
                 else:
                     drive = (speed, -speed)
                 ins = 'DRIVE {Left %f} {Right %f}\r\n' % drive
-                Control.send('INTERFACE', ins)
+                Control.send('Interface', ins)
                 start = False
 
             ta = odo[3]
             tr = ta - ts
             if abs(tr) >= rad:
                 ins = 'DRIVE {Left %f} {Right %f}\r\n' % (0.0, 0.0)
-                Control.send('INTERFACE', ins)
+                Control.send('Interface', ins)
                 Control.send(self.__active_task, 'OK')
                 return
 
@@ -131,13 +129,13 @@ class Steering:
 
 
     def __odometry(self):
-        if not Control.send('SENSORS', 'GET ODOMETRY'):
+        if not Control.send('Sensors', 'GET ODOMETRY'):
             return
         
         while True:
             recv = Control.receive(True)
             if not recv:
-                Control.send('CONTROL', 'FAIL Expecting message from sensors')
+                Control.send('Control', 'FAIL Expecting message from sensors')
                 return
             
             module, data = map(str.upper, recv)
