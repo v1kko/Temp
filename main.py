@@ -52,5 +52,3 @@ for x in socketlist.itervalues():
 while True:
 	ready, _, _ = select(socketlist.values(), (), (), 0.5)
 
-	
-

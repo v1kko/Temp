@@ -1,6 +1,7 @@
 import socket
 from select import select
 from Queue import Queue
+from config import *
 
 class Control: 
 	"""
