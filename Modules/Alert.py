@@ -15,7 +15,7 @@ from Control import *
 class Alert:
     
     def __init__(self):
-        init()
+        self.ctrl = Control(self.__class__.__name__)
         self.TRESHOLD = 0.250
         self.RECOVERTIME = 5
         self.running = True
@@ -28,9 +28,9 @@ class Alert:
     
     def check(self, sensor):
         data = ""
-        self.send("Sensors", "GET " + sensor)
+        self.ctrl.send("Sensors", "GET " + sensor)
         while not data[:5] == sensor:
-            src, data = receive()
+            src, data = self.ctrl.receive()
             
             if src == "main" and data == "STOP":
                 self.running = False
