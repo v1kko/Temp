@@ -54,6 +54,12 @@ class Steering:
             if match('^FAIL\ .*$', data):
                 #TODO: Error handling
                 pass
+
+            #Return the gridsize if requested
+            elif data == 'GRIDSIZE':
+                self.ctrl.send(self.__active_task, 'GRIDSIZE %f' % self.grid_size)
+                continue
+
             #Check whether you receive a float/int when you expect to
             elif not match('^(MOVE|TURN\ [0-9]+(\.[0-9]+)?|\.[0-9]+)|' + \
                            '(SET\ MOVE|TURN)\ [0-9]+(\.[0-9]+)?|\.[0-9]+$', data):
