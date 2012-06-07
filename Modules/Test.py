@@ -10,17 +10,8 @@ Tests are well defined by their names.
 """
 import unittest
 import socket
+import time
 from Control import *
-
-"""
-def receive(boolean=True):
-    if boolean is True:
-        return "SRC", "Steering ODOMETRY 0.3 0.4 0.6"
-    else:
-        return "SRC", "Sensors ODOMETRY FAIL"
-"""
-
-
 
 def isFloatAndPositive(num):
     try:
@@ -40,21 +31,26 @@ class Test():
         unittest.main(verbosity=2)
 
 class TestSensorsRightInput(unittest.TestCase):
-
+    
+    def sleepAndGetInput(self):
+        time.sleep(1)
+        reply = ctrl.receive(False)
+        self.assertTrue(reply is not None)
+        return reply
     
     def testProperSensorType(self):
         """ Checking wether the second value indicates a proper sensor type """
         for i, sensType in enumerate(("ODOMETRY", "ODOMETRY", "ODOMETRY")):
-            ctrl.send("Sensors", "STEER GET " + sensType)
-            src, rcv = ctrl.receive()
+            ctrl.send("Sensors", "Steering GET " + sensType)
+            src, rcv = self.sleepAndGetInput()
             rcv = rcv.split(" ")
             self.assertEqual(sensType, rcv[1])
 
     def testReturnValueNumber(self):
         """ Checking the expected number of values """
         for i, sensType in enumerate(("ODOMETRY", "ODOMETRY", "ODOMETRY")):
-            ctrl.send("Sensors", "STEER GET " + sensType)
-            src, rcv = ctrl.receive()
+            ctrl.send("Sensors", "Steering GET " + sensType)
+            src, rcv = self.sleepAndGetInput()
             rcv = rcv.split(" ")
             
             if sensType == 'LASER':
@@ -67,8 +63,8 @@ class TestSensorsRightInput(unittest.TestCase):
     def testProperSensorParameters(self):
         """ Checking per sensor type for the right amount of parameters """
         for i, sensType in enumerate(("ODOMETRY", "ODOMETRY", "ODOMETRY")):
-            ctrl.send("Sensors", "STEER GET " + sensType)
-            src, rcv = ctrl.receive()
+            ctrl.send("Sensors", "Steering GET " + sensType)
+            src, rcv = self.sleepAndGetInput()
             rcv = rcv.split(" ")
 
             if sensType == 'LASER':
@@ -83,26 +79,30 @@ class TestSensorsRightInput(unittest.TestCase):
 
 class TestSensorsWrongInput(unittest.TestCase):
     # TODO remove False from receivce paramter
+    
+    def sleepAndGetInput(self):
+        time.sleep(1)
+        reply = receive(True)
+        self.assertTrue(reply is not None)
+        return reply
+        
     def testUnkownSensorType(self):
         """ Checking the expected number of values """
-        ctrl.send("Sensors", "STEER GET GPS")
-        src, rcv = ctrl.receive()
+        ctrl.send("Sensors", "Steering GET GPS")
+        src, rcv = self.sleepAndGetInput()
         rcv = rcv.split(" ")
         self.assertEqual(3, len(rcv))
         
     def testNoSensorType(self):
         """ Checking the expected number of values """
-        ctrl.send("Sensors", "STEER ")
-        src, rcv = ctrl.receive()
+        ctrl.send("Sensors", "Steering ")
+        src, rcv = self.sleepAndGetInput()
         rcv = rcv.split(" ")
         self.assertEqual(3, len(rcv))
 
     def testTooManyArguments(self):
         """ Checking the expected number of values """
-        ctrl.send("Sensors", "STEER GET GPS PLUS MORE ARGUMENTS")
-        src, rcv = ctrl.receive()
+        ctrl.send("Sensors", "Steering GET GPS PLUS MORE ARGUMENTS")
+        src, rcv = self.sleepAndGetInput()
         rcv = rcv.split(" ")
         self.assertEqual(3, len(rcv))
- 
-        
-S = Test()

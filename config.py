@@ -1,6 +1,7 @@
 from Modules.Sensors import *
 from Modules.Steering import *
 from Modules.Interface import *
+from Modules.Test import *
 
 modules = {
 #Format = Module : (modulename, port, host, login, password, (arguments))
@@ -9,6 +10,7 @@ modules = {
 	Interface:('Interface', 2332, 'localhost', '', '', ('localhost', 3000)),
 	Steering:('Steering', 22532, 'localhost', '', '', ()),
 	Sensors:('Sensors', 54332, 'localhost', '', '',()),
+	#Test:('Test', 54232, 'localhost', '', '',()),
 }
 
 

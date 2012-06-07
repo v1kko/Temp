@@ -37,7 +37,6 @@ class Control:
 		Returns False on error
 		Returns True on succes
 		"""
-		print dest + ', ' + data
 		try:
 			sock = self.sockdict[dest]
 		except KeyError:
