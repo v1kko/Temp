@@ -103,6 +103,3 @@ class TestSensorsWrongInput(unittest.TestCase):
         src, rcv = ctrl.receive()
         rcv = rcv.split(" ")
         self.assertEqual(3, len(rcv))
- 
-        
-S = Test()
