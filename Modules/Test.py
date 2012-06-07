@@ -34,13 +34,14 @@ class TestSensorsRightInput(unittest.TestCase):
     
     def sleepAndGetInput(self):
         time.sleep(1)
-        reply = ctrl.receive(False)
+        reply = ctrl.receive(True)
         self.assertTrue(reply is not None)
+
         return reply
     
     def testProperSensorType(self):
         """ Checking wether the second value indicates a proper sensor type """
-        for i, sensType in enumerate(("ODOMETRY", "ODOMETRY", "ODOMETRY")):
+        for i, sensType in enumerate(("LASER", "ODOMETRY", "SONAR")):
             ctrl.send("Sensors", "Steering GET " + sensType)
             src, rcv = self.sleepAndGetInput()
             rcv = rcv.split(" ")
@@ -48,7 +49,7 @@ class TestSensorsRightInput(unittest.TestCase):
 
     def testReturnValueNumber(self):
         """ Checking the expected number of values """
-        for i, sensType in enumerate(("ODOMETRY", "ODOMETRY", "ODOMETRY")):
+        for i, sensType in enumerate(("LASER", "ODOMETRY", "SONAR")):
             ctrl.send("Sensors", "Steering GET " + sensType)
             src, rcv = self.sleepAndGetInput()
             rcv = rcv.split(" ")
@@ -62,7 +63,7 @@ class TestSensorsRightInput(unittest.TestCase):
             
     def testProperSensorParameters(self):
         """ Checking per sensor type for the right amount of parameters """
-        for i, sensType in enumerate(("ODOMETRY", "ODOMETRY", "ODOMETRY")):
+        for i, sensType in enumerate(("LASER", "ODOMETRY", "SONAR")):
             ctrl.send("Sensors", "Steering GET " + sensType)
             src, rcv = self.sleepAndGetInput()
             rcv = rcv.split(" ")
