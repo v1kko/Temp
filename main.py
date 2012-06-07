@@ -23,7 +23,10 @@ for module, dest in modules.iteritems():
 		continue
 	
 	child = Process(target=module, args=args)
-	child.start()
+	try:
+		child.start()
+	except TypeError:
+		exit(0)
 
 socketlist = {}
 for name, _, _, _, _, _ in modules.itervalues():
@@ -47,4 +50,7 @@ print 'All processes ready, Starting up'
 for x in socketlist.itervalues():
 	x.send('START')
 while True:
-	pass
+	ready, _, _ = select(socketlist.values(), (), (), 0.5)
+
+	
+
