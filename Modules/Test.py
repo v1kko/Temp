@@ -83,7 +83,7 @@ class TestSensorsWrongInput(unittest.TestCase):
     
     def sleepAndGetInput(self):
         time.sleep(1)
-        reply = receive(True)
+        reply = ctrl.receive(True)
         self.assertTrue(reply is not None)
         return reply
         
