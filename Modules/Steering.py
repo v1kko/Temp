@@ -45,12 +45,13 @@ class Steering:
 
             self.__active_task, data = self.__command_queue.get()
             data = data.upper()
-            if match('^FAIL\ $', data):
+            if match('^FAIL\ .*$', data):
                 #TODO: Error handling
                 pass
             elif not match('^(MOVE|TURN\ [0-9]+(\.[0-9]+)?|\.[0-9]+)|' + \
                            '(SET\ MOVE|TURN)\ [0-9]+(\.[0-9]+)?|\.[0-9]+$', data):
-                self.ctrl.send(self.__active_task, 'FAIL Unknown message format')
+                self.ctrl.send(self.__active_task, 
+                               'FAIL Unknown message format: %s' % (data))
             else:
                 func, parm1, parm2 = data.split()
                 load, cast1, cast2 = self.__FUNCS[func]
@@ -65,14 +66,14 @@ class Steering:
         elif data == 'STOP':
             self.stop_signal = True
             return True
+        elif data == 'ISEMPTY':
+            self.ctrl.send('Test', 'ISEMPTY %r' % (self.__command_queue.empty()))
         return False
 
 
     def add(self, set_type, step_size):
         if set_type.upper() == 'MOVE':
-            self.step_dist = step_size
-        elif set_type.upper() == 'TURN':
-            self.step_angle = step_size
+            self.grid_size = step_size
 
 
     def move(self, speed, distance):    
@@ -151,6 +152,8 @@ class Steering:
             module, data = map(str.upper, recv)
             if self.__hard_signal(data):
                 return
+            if data == 'ISEMPTY':
+                continue
             if module == 'SENSORS' and match('^ODOMETRY\ ' + \
                 '([0-9]+(\.[0-9]+)?|\.[0-9]+\ ){2}' + \
                 '[0-9]+(\.[0-9]+)?|\.[0-9]+$', data):

@@ -106,6 +106,3 @@ class TestSensorsWrongInput(unittest.TestCase):
         src, rcv = self.sleepAndGetInput()
         rcv = rcv.split(" ")
         self.assertEqual(3, len(rcv))
- 
-        
-S = Test()
