@@ -8,6 +8,7 @@ TODO: Comments
 from Control import *
 
 class Sensors:
+    # Init
     def __init__(self):
         self.ctrl = Control(self.__class__.__name__)
         self.data = ""
@@ -18,7 +19,8 @@ class Sensors:
         
         self.running = True
         self.receive()
-        
+    
+    # Receive and store data
     def receive(self):
         while(self.running):
             rcv = self.ctrl.receive(True)
@@ -57,8 +59,7 @@ class Sensors:
                         
                 self.data = self.data[len(self.data) - 1]
             
-            # Respond to msges from main
-            # TODO: respond to resets n stuff
+            # Respond to msges from main (STOP, RESTART)
             elif src == "Main":
                 # 
                 if rcv == "RESTART":
@@ -67,7 +68,7 @@ class Sensors:
                 if rcv == "STOP":
                     self.running = False
 
-            # Reply to GET
+            # Reply to GET by sending last known values
             else:
                 rcv = rcv.split(' ')
                 if rcv[0] == "GET":
