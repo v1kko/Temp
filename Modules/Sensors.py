@@ -21,7 +21,12 @@ class Sensors:
         
     def receive(self):
         while(self.running):
-            src, rcv = self.ctrl.receive(True)
+            rcv = self.ctrl.receive(True)
+            
+            if rcv == None:
+                break
+            else:
+                src, rcv = rcv
             
             # Mine data from Bot stream
             if src == "Interface":

@@ -30,8 +30,12 @@ class Alert:
         data = ""
         self.ctrl.send("Sensors", "GET " + sensor)
         while not data[:5] == sensor:
-            src, data = self.ctrl.receive()
-            
+            data = self.ctrl.receive()
+            if data == None:
+                break
+            else:
+                src, data = data
+                
             if src == "main" and data == "STOP":
                 self.running = False
                 exit()
